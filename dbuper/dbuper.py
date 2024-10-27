@@ -9,8 +9,14 @@ from pydrive2.auth import GoogleAuth
 from pydrive2.drive import GoogleDrive
 from datetime import datetime
 from crontab import CronTab
+import shutil
 
 DB_CONFIG_FILE = 'db_configs.json'
+
+VERSION = "0.1.1"
+
+# Default backup directory
+DEFAULT_BACKUP_PATH = os.path.abspath("backup/")
 
 def load_db_configs():
     """Load existing database configurations from file."""
@@ -24,10 +30,18 @@ def save_db_configs(configs):
     with open(DB_CONFIG_FILE, 'w') as f:
         json.dump(configs, f, indent=4)
 
+# Main CLI entry
 @click.group()
+@click.version_option(VERSION, "--version", help="Show the version of dbuper.")
 def cli():
     """Main entry point for dbuper."""
     pass
+
+# Command to show the default backup path
+@cli.command()
+def path():
+    """Show the full path of the backup folder."""
+    click.echo(f"Default backup path is: {DEFAULT_BACKUP_PATH}")
 
 # Step 1: Register a New Database Configuration
 @cli.command(name='register')
@@ -78,9 +92,17 @@ def list_dbs():
 def backup(config_name, cloud, local_path, s3_bucket, dropbox_token, gdrive_folder_id, gdrive_config_file, s3_access_key, s3_secret_key):
     """Perform a database backup and upload to specified cloud storage or local."""
     configs = load_db_configs()
+    mysqldump_path = shutil.which("mysqldump")
     if config_name not in configs:
         click.echo(f"Error: No database configuration found with the name '{config_name}'.")
         return
+
+    if mysqldump_path is None:
+        click.echo("Error: mysqldump is not installed or not found in the system PATH.")
+        return
+
+
+
 
     # Load the selected database config
     db_config = configs[config_name]
@@ -91,7 +113,7 @@ def backup(config_name, cloud, local_path, s3_bucket, dropbox_token, gdrive_fold
     # Create a backup file with timestamp
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     output_file = f"{db_name}_backup_{timestamp}.sql"
-    backup_cmd = f"mysqldump -u {db_user} -p{db_password} {db_name} > {output_file}"
+    backup_cmd = f"{mysqldump_path} -u {db_user} -p{db_password} {db_name} > {output_file}"
 
     try:
         subprocess.run(backup_cmd, shell=True, check=True)
@@ -129,10 +151,22 @@ def backup(config_name, cloud, local_path, s3_bucket, dropbox_token, gdrive_fold
 @click.option('--s3-secret-key', default='', help="AWS Secret Key (if using S3)")
 def schedule_backup(interval, config_name, cloud, local_path, s3_bucket, dropbox_token, gdrive_folder_id, gdrive_config_file, s3_access_key, s3_secret_key):
     """Schedule a Backup Command"""
-    print(config_name)
+    configs = load_db_configs()
+    dbuper_path = shutil.which("dbuper")
+
+    if config_name not in configs:
+        click.echo(f"Error: No database configuration found with the name '{config_name}'.")
+        return
+    
+    if dbuper_path is None:
+        click.echo("Error: dbuper is not installed or not found in the system PATH.")
+        return
+    
+    log_file_path = "dbuper_backup.log"
+
     cron = CronTab(user=True)
     command = (
-        f'dbuper backup --config-name={config_name} --cloud={cloud} '
+        f'{dbuper_path} backup --config-name={config_name} --cloud={cloud} '
         f'{"--local-path=" + local_path if cloud == "local" else ""} '
         f'{"--s3-bucket=" + s3_bucket if cloud == "s3" else ""} '
         f'{"--dropbox-token=" + dropbox_token if cloud == "dropbox" else ""} '
@@ -140,6 +174,7 @@ def schedule_backup(interval, config_name, cloud, local_path, s3_bucket, dropbox
         f'{"--gdrive-config-file=" + gdrive_config_file if cloud == "gdrive" else ""} '
         f'{"--s3-access-key=" + s3_access_key if cloud == "s3" else ""} '
         f'{"--s3-secret-key=" + s3_secret_key if cloud == "s3" else ""}'
+        f'>> {log_file_path} 2>&1'
      )
 
     job = cron.new(command=command)

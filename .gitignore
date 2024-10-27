@@ -1,3 +1,6 @@
 # Ignore the myenv directory
 myenv
 db_configs.json
+dbuper.egg-info
+dist
+
