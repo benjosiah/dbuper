@@ -1,5 +1,0 @@
-click
-dropbox
-boto3
-pydrive2
-python-crontab

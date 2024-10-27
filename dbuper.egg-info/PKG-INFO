@@ -1,8 +1,0 @@
-Metadata-Version: 2.1
-Name: dbuper
-Version: 1.0.0
-Requires-Dist: click
-Requires-Dist: dropbox
-Requires-Dist: boto3
-Requires-Dist: pydrive2
-Requires-Dist: python-crontab
