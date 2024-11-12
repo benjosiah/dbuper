@@ -1,8 +1,20 @@
+import os
+import re
 from setuptools import setup, find_packages
+
+# Function to read the version
+def get_version():
+    version_file = os.path.join("dbuper", "__init__.py")
+    with open(version_file) as f:
+        for line in f:
+            match = re.match(r"^__version__ = ['\"]([^'\"]*)['\"]", line)
+            if match:
+                return match.group(1)
+    raise RuntimeError("Unable to find version string.")
 
 setup(
  name="dbuper",
-    version="0.1.1",
+    version=get_version(),
     description="A tool for automated database backups and scheduling.",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
