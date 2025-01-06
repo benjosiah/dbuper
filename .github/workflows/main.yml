@@ -25,10 +25,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install .
 
-      - name: Test the package (optional)
-        run: |
-          pytest  # Run tests if you have any set up
-
       - name: Publish the package to PyPI
         if: github.ref == 'refs/heads/main'  # Only on main branch push
         run: |
