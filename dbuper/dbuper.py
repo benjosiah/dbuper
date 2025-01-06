@@ -14,7 +14,7 @@ from . import __version__
 
 DB_CONFIG_FILE = 'db_configs.json'
 
-VERSION = "0.1.1"
+VERSION = "0.1.2"
 
 # Default backup directory
 DEFAULT_BACKUP_PATH = os.path.abspath("backup/")
