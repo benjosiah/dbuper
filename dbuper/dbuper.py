@@ -178,6 +178,7 @@ def schedule_backup(interval, config_name, cloud, local_path, s3_bucket, dropbox
         f'>> {log_file_path} 2>&1'
      )
 
+
     job = cron.new(command=command)
     job.minute.every(interval)
     cron.write()
