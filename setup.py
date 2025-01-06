@@ -13,7 +13,7 @@ def get_version():
     raise RuntimeError("Unable to find version string.")
 
 setup(
- name="dbuper",
+ name="dbuper-cli",
     version=get_version(),
     description="A tool for automated database backups and scheduling.",
     long_description=open("README.md").read(),
