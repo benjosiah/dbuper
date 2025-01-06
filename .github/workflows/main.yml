@@ -29,6 +29,7 @@ jobs:
         if: github.ref == 'refs/heads/main'  # Only on main branch push
         run: |
           pip install twine
+          pip install wheel
           python setup.py sdist bdist_wheel
           twine upload dist/*  # Publish to PyPI (using token for authentication)
         env:
