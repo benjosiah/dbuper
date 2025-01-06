@@ -1,0 +1,40 @@
+name: Automate Pip Package Update
+
+on:
+  push:
+    branches:
+      - main  # Trigger on push to the main branch
+    paths:
+      - '**/*.py'  # Trigger when Python files are modified
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # Run on the latest Ubuntu version
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'  # Adjust Python version as needed
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install .
+
+      - name: Test the package (optional)
+        run: |
+          pytest  # Run tests if you have any set up
+
+      - name: Publish the package to PyPI
+        if: github.ref == 'refs/heads/main'  # Only on main branch push
+        run: |
+          pip install twine
+          python setup.py sdist bdist_wheel
+          twine upload dist/*  # Publish to PyPI (using token for authentication)
+        env:
+          TWINE_USERNAME: __token__  # Use the reserved username for PyPI token authentication
+          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}  # Use the GitHub secret for the token

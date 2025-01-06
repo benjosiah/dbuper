@@ -167,7 +167,7 @@ def schedule_backup(interval, config_name, cloud, local_path, s3_bucket, dropbox
 
     cron = CronTab(user=True)
     command = (
-        f'{dbuper_path} backup --config-name={config_name} --cloud={cloud} '
+        f'sudo {dbuper_path} backup --config-name={config_name} --cloud={cloud} '
         f'{"--local-path=" + local_path if cloud == "local" else ""} '
         f'{"--s3-bucket=" + s3_bucket if cloud == "s3" else ""} '
         f'{"--dropbox-token=" + dropbox_token if cloud == "dropbox" else ""} '
