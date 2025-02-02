@@ -10,7 +10,7 @@ from pydrive2.drive import GoogleDrive
 from datetime import datetime
 from crontab import CronTab
 import shutil
-from . import __version__
+# from . import __version__
 
 DB_CONFIG_FILE = 'db_configs.json'
 
@@ -33,7 +33,7 @@ def save_db_configs(configs):
 
 # Main CLI entry
 @click.group()
-@click.version_option(__version__, "--version", help="Show the version of dbuper.")
+@click.version_option(VERSION, "--version", help="Show the version of dbuper.")
 def cli():
     """Main entry point for dbuper."""
     pass
