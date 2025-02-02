@@ -28,11 +28,12 @@ setup(
         "dropbox",
         "boto3",
         "pydrive2",
-        "python-crontab"
+        "python-crontab",
+        "setuptools"
     ],
     entry_points={
         'console_scripts': [
-            'dbuper=dbuper:cli',
+            'dbuper=dbuper.dbuper:cli',
         ],
     },
     classifiers=[

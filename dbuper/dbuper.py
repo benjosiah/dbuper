@@ -10,11 +10,9 @@ from pydrive2.drive import GoogleDrive
 from datetime import datetime
 from crontab import CronTab
 import shutil
-from version import __version__
+from . import __version__
 
 DB_CONFIG_FILE = 'db_configs.json'
-
-VERSION = "0.1.2"
 
 try:
     from . import __version__
