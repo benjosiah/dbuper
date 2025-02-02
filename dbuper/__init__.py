@@ -1,3 +1,3 @@
-from .dbuper import cli 
+from dbuper import cli 
 
-__version__ = "0.1.1.0"
+__version__ = "0.1.1.1"

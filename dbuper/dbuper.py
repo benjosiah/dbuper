@@ -10,11 +10,17 @@ from pydrive2.drive import GoogleDrive
 from datetime import datetime
 from crontab import CronTab
 import shutil
-# from . import __version__
+from version import __version__
 
 DB_CONFIG_FILE = 'db_configs.json'
 
 VERSION = "0.1.2"
+
+try:
+    from . import __version__
+    print("Version:", __version__)
+except ImportError as e:
+    print("Import error:", e)
 
 # Default backup directory
 DEFAULT_BACKUP_PATH = os.path.abspath("backup/")
@@ -33,7 +39,7 @@ def save_db_configs(configs):
 
 # Main CLI entry
 @click.group()
-@click.version_option(VERSION, "--version", help="Show the version of dbuper.")
+@click.version_option(__version__, "--version", help="Show the version of dbuper.")
 def cli():
     """Main entry point for dbuper."""
     pass

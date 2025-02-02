@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 # Function to read the version
 def get_version():
-    version_file = os.path.join("dbuper", "__init__.py")
+    version_file = os.path.join("dbuper", "version.py")
     with open(version_file) as f:
         for line in f:
             match = re.match(r"^__version__ = ['\"]([^'\"]*)['\"]", line)
