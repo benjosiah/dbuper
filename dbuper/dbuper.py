@@ -170,21 +170,36 @@ def schedule_backup(interval, config_name, cloud, local_path, s3_bucket, dropbox
     
     log_file_path = "dbuper_backup.log"
 
-    cron = CronTab(user=True)
-    command = (
-        f'sudo -S {dbuper_path} backup --config-name={config_name} --cloud={cloud} '
-        f'{"--local-path=" + local_path if cloud == "local" else ""} '
-        f'{"--s3-bucket=" + s3_bucket if cloud == "s3" else ""} '
-        f'{"--dropbox-token=" + dropbox_token if cloud == "dropbox" else ""} '
-        f'{"--gdrive-folder-id=" + gdrive_folder_id if cloud == "gdrive" else ""} '
-        f'{"--gdrive-config-file=" + gdrive_config_file if cloud == "gdrive" else ""} '
-        f'{"--s3-access-key=" + s3_access_key if cloud == "s3" else ""} '
-        f'{"--s3-secret-key=" + s3_secret_key if cloud == "s3" else ""}'
-        f'2> >(while read line; do echo "$(date +"%Y-%m-%d %H:%M:%S") ERROR: $line"; done >> {log_file_path}) '
-        f'>> {log_file_path}'
-     )
+    script_path = "dbuper_backup.sh"
 
-    job = cron.new(command=command)
+    # Create the shell script content
+    script_content = f"""#!/bin/bash
+    echo "$(date +"%Y-%m-%d %H:%M:%S") Running dbuper backup" >> {log_file_path}
+    {dbuper_path} backup --config-name={config_name} --cloud={cloud} \\
+    {"--local-path=" + local_path if cloud == "local" else ""} \\
+    {"--s3-bucket=" + s3_bucket if cloud == "s3" else ""} \\
+    {"--dropbox-token=" + dropbox_token if cloud == "dropbox" else ""} \\
+    {"--gdrive-folder-id=" + gdrive_folder_id if cloud == "gdrive" else ""} \\
+    {"--gdrive-config-file=" + gdrive_config_file if cloud == "gdrive" else ""} \\
+    {"--s3-access-key=" + s3_access_key if cloud == "s3" else ""} \\
+    {"--s3-secret-key=" + s3_secret_key if cloud == "s3" else ""} \\
+    2> >(while read line; do echo "$(date +"%Y-%m-%d %H:%M:%S") ERROR: $line"; done >> {log_file_path}) \\
+    >> {log_file_path}
+
+    echo "$(date +"%Y-%m-%d %H:%M:%S") Backup job completed" >> {log_file_path}
+    """
+
+    # Write the script to a file
+    with open(script_path, "w") as script_file:
+        script_file.write(script_content)
+
+    # Make the script executable
+    os.chmod(script_path, 0o755)
+
+    # Set up the cron job
+    cron = CronTab(user=True)
+    job = cron.new(command=f"/bin/bash {script_path}", comment="dbuper_backup")
+
     job.minute.every(interval)
     cron.write()
     click.echo(f"Scheduled backup every {interval} minutes for database {config_name}.")
