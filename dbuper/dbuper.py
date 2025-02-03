@@ -98,6 +98,7 @@ def backup(config_name, cloud, local_path, s3_bucket, dropbox_token, gdrive_fold
     """Perform a database backup and upload to specified cloud storage or local."""
     configs = load_db_configs()
     mysqldump_path = shutil.which("mysqldump")
+    click.echo(f"{mysqldump_path}")
     if config_name not in configs:
         click.echo(f"Error: No database configuration found with the name '{config_name}'.")
         return
@@ -171,7 +172,7 @@ def schedule_backup(interval, config_name, cloud, local_path, s3_bucket, dropbox
 
     cron = CronTab(user=True)
     command = (
-        f'sudo {dbuper_path} backup --config-name={config_name} --cloud={cloud} '
+        f'sudo -S {dbuper_path} backup --config-name={config_name} --cloud={cloud} '
         f'{"--local-path=" + local_path if cloud == "local" else ""} '
         f'{"--s3-bucket=" + s3_bucket if cloud == "s3" else ""} '
         f'{"--dropbox-token=" + dropbox_token if cloud == "dropbox" else ""} '
@@ -179,7 +180,8 @@ def schedule_backup(interval, config_name, cloud, local_path, s3_bucket, dropbox
         f'{"--gdrive-config-file=" + gdrive_config_file if cloud == "gdrive" else ""} '
         f'{"--s3-access-key=" + s3_access_key if cloud == "s3" else ""} '
         f'{"--s3-secret-key=" + s3_secret_key if cloud == "s3" else ""}'
-        f'>> {log_file_path} 2>&1'
+        f'2> >(while read line; do echo "$(date +"%Y-%m-%d %H:%M:%S") ERROR: $line"; done >> {log_file_path}) '
+        f'>> {log_file_path}'
      )
 
     job = cron.new(command=command)
