@@ -1,5 +1,4 @@
 # dbuper
-# Getting Started
 
 ## Introduction
 `dbuper` is a database backup tool designed for seamless, automated backups with support for multiple storage options, including local directories, Google Drive, and Dropbox. It provides a straightforward command-line interface for managing backups, scheduling, and configuration, allowing you to set up regular backups and easily retrieve stored backups when needed.

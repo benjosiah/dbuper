@@ -103,7 +103,7 @@ def backup(config_name, cloud, local_path, s3_bucket, dropbox_token, gdrive_fold
         return
 
     if mysqldump_path is None:
-        click.echo("Error: {mysqldump_path} is not installed or not found in the system PATH.")
+        click.echo(f"Error: {mysqldump_path} is not installed or not found in the system PATH.")
         return
 
 
