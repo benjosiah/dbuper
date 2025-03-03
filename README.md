@@ -31,7 +31,7 @@ dbuper --version
 
 ## Usage
 ### Configuration
-Set up a database configuration with dbuper by specifying the required connection details. This configuration makes it easier to reuse and manage multiple backup sources.
+Set up a database configuration with dbuper by specifying the required connection details. This configuration makes it easier to reuse and manage multiple backup sources on dbuper.
 
 ```bash
 dbuper register --name mydatabase --host localhost --user dbuser --password dbpass
